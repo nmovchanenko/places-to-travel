@@ -49,38 +49,6 @@ router.put("/:id", async (req, res) => {
     }
 });
 
-router.post("/wishlist", async (req, res) => {
-    const { userId, placeId } = req.body;
-
-    try {
-        const wishlist = await prisma.wishlist.create({
-            data: { userId, placeId },
-        });
-        res.status(201).json(wishlist);
-    } catch (err) {
-        if (err.code === "P2002") {
-            // Handle unique constraint violation
-            res.status(400).json({ error: "Place already in wishlist" });
-        } else {
-            res.status(400).json({ error: "Error adding place to wishlist" });
-        }
-    }
-});
-
-router.get("/wishlist/:userId", async (req, res) => {
-    const { userId } = req.params;
-
-    try {
-        const wishlist = await prisma.wishlist.findMany({
-            where: { userId: parseInt(userId) },
-            include: { place: true },
-        });
-        res.json(wishlist);
-    } catch (err) {
-        res.status(500).json({ error: "Error fetching wishlist" });
-    }
-});
-
 router.get("/search", async (req, res) => {
     const { search, userId, owned, inWishlist } = req.query;
 
