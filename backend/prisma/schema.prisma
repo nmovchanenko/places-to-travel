@@ -20,6 +20,7 @@ model User {
   password String
   places   Place[]    @relation("OwnerPlaces") // Places created by the user
   wishlist Wishlist[] // Many-to-many relationship with places
+  Comment  Comment[]
 }
 
 model Place {
@@ -31,6 +32,7 @@ model Place {
   ownerId     Int // References the user who created the place
   owner       User       @relation("OwnerPlaces", fields: [ownerId], references: [id])
   wishlists   Wishlist[] // Many-to-many relationship with users
+  Comment     Comment[]
 }
 
 model Wishlist {
@@ -42,4 +44,16 @@ model Wishlist {
   visited Boolean @default(false) // Add this to track visited status
 
   @@unique([userId, placeId]) // Prevent duplicate wishlist entries
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  text      String // The content of the comment
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  placeId   Int // References the place being commented on
+  userId    Int // References the user who made this comment
+
+  user  User  @relation(fields: [userId], references: [id])
+  place Place @relation(fields: [placeId], references: [id])
 }

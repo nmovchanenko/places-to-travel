@@ -5,6 +5,7 @@ const { PrismaClient } = require("@prisma/client");
 const authRoutes = require("./routes/auth");
 const placeRoutes = require("./routes/places");
 const wishlistRoutes = require("./routes/wishlist");
+const commentRoutes = require("./routes/comments");
 
 dotenv.config();
 const app = express();
@@ -25,3 +26,4 @@ app.listen(PORT, () => {
 app.use("/auth", authRoutes);
 app.use("/places", placeRoutes);
 app.use("/wishlist", wishlistRoutes);
+app.use("/comments", commentRoutes);
