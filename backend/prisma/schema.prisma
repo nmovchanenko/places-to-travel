@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int        @id @default(autoincrement())
+  username String     @unique
+  email    String     @unique
+  password String
+  places   Place[]    @relation("OwnerPlaces") // Places created by the user
+  wishlist Wishlist[] // Many-to-many relationship with places
+}
+
+model Place {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String
+  address     String
+  visited     Boolean    @default(false)
+  ownerId     Int // References the user who created the place
+  owner       User       @relation("OwnerPlaces", fields: [ownerId], references: [id])
+  wishlists   Wishlist[] // Many-to-many relationship with users
+}
+
+model Wishlist {
+  id      Int   @id @default(autoincrement())
+  userId  Int
+  placeId Int
+  user    User  @relation(fields: [userId], references: [id])
+  place   Place @relation(fields: [placeId], references: [id])
+
+  @@unique([userId, placeId]) // Ensure one user can add a place only once
+}
