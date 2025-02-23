@@ -81,4 +81,47 @@ router.get("/wishlist/:userId", async (req, res) => {
     }
 });
 
+router.get("/search", async (req, res) => {
+    const { search, userId, owned, inWishlist } = req.query;
+
+    try {
+        const filters = {
+            ...(search && {
+                OR: [
+                    { name: { contains: search } },
+                    { description: { contains: search } },
+                    { address: { contains: search } },
+                ],
+            }),
+        };
+
+        if (owned === "true" && userId) {
+            filters.ownerId = parseInt(userId);
+        }
+
+        if (inWishlist === "true" && userId) {
+            // Filter by places in the user's wishlist
+            const wishlistItems = await prisma.wishlist.findMany({
+                where: { userId: parseInt(userId) },
+                select: { placeId: true },
+            });
+
+            const placeIds = wishlistItems.map((item) => item.placeId);
+            filters.id = { in: placeIds }; // Filter by place IDs in the wishlist
+        }
+
+        const places = await prisma.place.findMany({
+            where: filters,
+            include: {
+                wishlists: true,
+            },
+        });
+
+        res.json(places);
+    } catch (err) {
+        res.status(500).json({ error: `Error fetching places with filters. ${err.message}` });
+    }
+});
+
+
 module.exports = router;

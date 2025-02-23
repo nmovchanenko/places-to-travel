@@ -34,11 +34,12 @@ model Place {
 }
 
 model Wishlist {
-  id      Int   @id @default(autoincrement())
+  id      Int     @id @default(autoincrement())
   userId  Int
   placeId Int
-  user    User  @relation(fields: [userId], references: [id])
-  place   Place @relation(fields: [placeId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  place   Place   @relation(fields: [placeId], references: [id])
+  visited Boolean @default(false) // Add this to track visited status
 
-  @@unique([userId, placeId]) // Ensure one user can add a place only once
+  @@unique([userId, placeId]) // Prevent duplicate wishlist entries
 }
